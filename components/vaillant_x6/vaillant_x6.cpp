@@ -34,6 +34,27 @@ void VaillantX6Component::setup() {
         add_command(cmd);
     }
     {
+        auto cmd = new GetOnOffStatusCommand(4);
+        cmd->name = "Get Gas Valve State";
+        cmd->sensor_name = "Vaillant X6 Gas Valve";
+        cmd->object_id = "vaillant_x6_gas_valve";
+        cmd->request_bytes = {0x07, 0x00, 0x00, 0x00, 0x48, 0x01, 0x71};
+        cmd->icon = "mdi:valve";
+        cmd->on_value = 0x0f;
+        add_command(cmd);
+    }
+    {
+        auto cmd = new GetOnOffStatusCommand(4);
+        cmd->name = "Get Summer Winter State";
+        cmd->sensor_name = "Vaillant X6 Summer Winter";
+        cmd->object_id = "vaillant_x6_summer_winter";
+        cmd->request_bytes = {0x07, 0x00, 0x00, 0x00, 0x08, 0x01, 0xf1};
+        cmd->icon = "mdi:sun-snowflake-variant";
+        cmd->on_value = 0x01;
+        cmd->interval = 6; // 10s polling => 60s
+        add_command(cmd);
+    }
+    {
         auto cmd = new GetTemperatureCommand(6);
         cmd->name = "Get Flow Temperature";
         cmd->sensor_name = "Vaillant X6 Flow Temperature";
@@ -69,13 +90,33 @@ void VaillantX6Component::setup() {
         cmd->interval = 6; // 10s polling => 60s
         add_command(cmd);
     }
-        {
+    {
         auto cmd = new GetTemperatureCommand(6);
         cmd->name = "Get Outside Temperature";
         cmd->sensor_name = "Vaillant X6 Outside Temperature";
         cmd->object_id = "vaillant_x6_outside_temperature";
         cmd->request_bytes = {0x07, 0x00, 0x00, 0x00, 0x6a, 0x03, 0x37};
         cmd->icon = "mdi:home-thermometer";
+        cmd->interval = 6; // 10s polling => 60s
+        add_command(cmd);
+    }
+    {
+        auto cmd = new GetTemperatureCommand(6);
+        cmd->name = "Get Hot Water Temperature";
+        cmd->sensor_name = "Vaillant X6 Hot Water Temperature";
+        cmd->object_id = "vaillant_x6_hot_water_temperature";
+        cmd->request_bytes = {0x07, 0x00, 0x00, 0x00, 0x16, 0x03, 0xcf};
+        cmd->icon = "mdi:thermometer-water";
+        cmd->interval = 3; // 10s polling => 30s
+        add_command(cmd);
+    }
+    {
+        auto cmd = new GetTemperatureCommand(5);
+        cmd->name = "Get Hot Water Target Temperature";
+        cmd->sensor_name = "Vaillant X6 Hot Water Target Temperature";
+        cmd->object_id = "vaillant_x6_hot_water_target_temperature";
+        cmd->request_bytes = {0x07, 0x00, 0x00, 0x00, 0x01, 0x02, 0xe0};
+        cmd->icon = "mdi:thermometer-water";
         cmd->interval = 6; // 10s polling => 60s
         add_command(cmd);
     }
@@ -166,7 +207,7 @@ void GetTemperatureCommand::init_sensor() {
     sensor.set_state_class(sensor::STATE_CLASS_MEASUREMENT);
     sensor.set_device_class("temperature");
     sensor.set_unit_of_measurement("°C");
-    sensor.set_accuracy_decimals(0);
+    sensor.set_accuracy_decimals(1);
     App.register_sensor(&sensor);
 }
 

@@ -21,6 +21,10 @@ Continuously reads the following sensor values from the boiler and sends them to
 | **Outside Temperature**                              | 60s      |
 | **Burner Status (On/Off)**                           | 10s      |
 | **Circulating Pump Status (On/Off)**                 | 10s      |
+| **Gas Valve (On/Off)**                               | 10s      |
+| **Summer Winter State**                              | 60s      |
+| **Hot Water Target Temperature**                     | 60s      |
+| **Hot Water Temperature**                            | 30s      |
 
 
 ## Installation  
