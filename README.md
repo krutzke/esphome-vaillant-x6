@@ -1,7 +1,7 @@
 # esphome-vaillant-x6  
 
 ESPHome component for Vaillant heating boilers with the X6 interface.  
-
+This is a fork from ulich/esphome-vaillant-x6 (thank you)
 
 ## Overview  
 
@@ -33,22 +33,27 @@ Add the `vaillant_x6` and a `uart` component to your ESPHome configuration.
 
 ```yaml
 esphome:
-  name: vaillant_x6
-  platform: ESP32
-  board: esp32dev
+  name: vaillantx6
+
+esp8266:
+  board: esp01_1m
 
 external_components:
-  - source: github://ulich/esphome-vaillant-x6
+  - source: github://krutzke/esphome-vaillant-x6
     components: [ vaillant_x6 ]
 
+# Disable logging
+logger:
+  baud_rate: 0
+
 uart:
-  id: my_uart
-  tx_pin: GPIO06
-  rx_pin: GPIO07
+  id: x6_uart
+  tx_pin: GPIO3
+  rx_pin: GPIO1
   baud_rate: 9600
 
 vaillant_x6:
-  uart_id: my_uart
+  uart_id: x6_uart
 ```
 
 You can also choose other GPIO pins for TX and RX on the ESP.
@@ -61,7 +66,7 @@ Only the `uart_id` must be configured. There are no more configuration propertie
 
 ## Vaillant X6 Interface  
 
-The **X6 interface** is a service port found on some older Vaillant boilers (for example on Vaillant ecoTEC classic VC 196/2 - C). It provides a simple 5V-UART communication interface for retrieving operational data.
+The **X6 interface** is a service port found on some older Vaillant boilers (for example on Vaillant ecoTEC classic VC 196/2 - C). It provides a simple 5V-UART communication interface for retrieving operational data. I have a VCW 246/2-C.
 
 <p align="center">
   <img src="./doc/vaillant-board.jpg" alt="Vaillant board"/>
@@ -72,35 +77,41 @@ The **X6 interface** is a service port found on some older Vaillant boilers (for
 
 To safely connect an ESP device to the boiler's X6 interface, a **galvanic isolation** is recommended to avoid electrical damage to both the ESP but more importantly to the circuit board of the boiler. This can be achieved using optocouplers. Also note, that the ESP uses 3,3V and the X6 interface operates on 5V. **Connecting the ESP directly to the X6 interface will damage your ESP immediately!**
 
-
-### Wiring Example  
-
+### my Wiring Example with ESP-01S
+### ADUM1201 Board (Dual Channel Digital Magnetic Isolator)
+### DC/DC Stepdown Board AMS1117 LDO 800MA 3.3V
+### 220µ/16V Elko
 ```
-                         +-----------+        +--------+
-                         |Optocoupler|        |Inverter|
-                         |           |        |        |
-              +----------|VCC     IN |--------|OUT   IN|-----+
-              |      +---|OUT        |        |        |     |
-+-------+     |  +---+---|GND    GND |---+    |     GND|-----+--------+
-|  3,3V |-----+  |   |   |           |   |    |     VCC|-----+----+   |     +---------+
-|       |     |  |   |   +-----------+   |    +--------+     |    |   |     --- 24V   |
-|    RX |------------+                   +-------------------|----|---+---- --- GND   +--+
-|    TX |------------+                                       +----|---|---- --- TX       |
-|       |     |  |   |                                       +----|---|---- --- RX       |
-|   GND |-----|--+   |    +--------+        +-----------+    |    +---|---- --- 5V    +--+
-+-------+     |  |   |    |Inverter|        |Optocoupler|    |    |   |     ---       |
-   ESP        |  |   |    |        |        |           |    |    |   |     +---------+
-              |  |   +----|IN   OUT|--------|IN     VCC |----|----+   |          X6
-              |  |        |        |        |           |    |        |     When looking onto
-              |  +--------|GND     |    +---|GND    OUT |----+        |    the port from above
-              +--|--------|VCC     |    |   |       GND |-------------+
-                 |        +--------+    |   +-----------+
-                 |                      |
-                 +----------------------+
-```
+              
+----------+                     +------------+          
+  ESP-01S                       |  ADUM1201  |          
+                                |            |           +---------+
+    +-----------------------+---|V1        V2|----+      --- 24V   |
+    |                       |   |            |    | +--- --- GND   +--+
+    8  7--------------------|---|AO1      AI2|----|-|--- --- TX       |
+    6  5             +------|---|BI1      BO2|----|-|--- --- RX       |
+    4  3             |      |   |            |    +-|--- --- 5V    +--+
+    2  1-------------|------|-+-|G1        G2|----|-+    ---       |
+    |                |      | | |            |    | |    +---------+
+    +----------------+      | | +------------+    | |
+----------+                 | |                   | |
+                            | +-------------------|-+
+                            | |                   | |
+                            | |   +--------+      | |
+                            | |   | AMS117 |      | |
+                            | |   |        |      | |
+                     +------|-+   |     VIN|------+ |
+          220µ/16V  ---     |     |     GND|--------+
+                   +###     +-----|VOUT    |
+                     +------+     |  3.3V  |
+                                  +--------+
 
-Simple optocouplers usually invert the signal, therefore an inverter is necessary. Note that resistors are not included in the schematic above for simplicity.
 
+This circuit is designed for ESP-01S, so the power supply comes from the X6 port.
+
+The ADUM1201 isolates EPS and X6 from each other and adjusts the 5V / 3.3.V levels.
+AMS117 is a simple 3.3V DC/DC stepdown regulator and provides the power supply for the economical ESP-01S. 
+Other ESPs with more power consumption must have a separate power supply.
 
 ## Acknowledgments
 
