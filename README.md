@@ -71,6 +71,9 @@ The **X6 interface** is a service port found on some older Vaillant boilers (for
 <p align="center">
   <img src="./doc/vaillant-board.jpg" alt="Vaillant board"/>
 </p>
+<p align="center">
+  <img src="./doc/vaillant-board-vcw246-2-c.jpg" alt="Vaillant board vcw246/2-c"/>
+</p>
 
 
 ### Connection  
@@ -112,6 +115,13 @@ This circuit is designed for ESP-01S, so the power supply comes from the X6 port
 The ADUM1201 isolates EPS and X6 from each other and adjusts the 5V / 3.3.V levels.
 AMS117 is a simple 3.3V DC/DC stepdown regulator and provides the power supply for the economical ESP-01S. 
 Other ESPs with more power consumption must have a separate power supply.
+
+<p align="center">
+  <img src="./doc/esp-01s-top.jpg" alt="ESP-01S TOP"/>
+  <img src="./doc/esp-01s-top2.jpg" alt="ESP-01S TOP 2"/>
+  <img src="./doc/esp-01side.jpg" alt="ESP-01S SIDE"/>
+</p>
+
 
 ## Acknowledgments
 
