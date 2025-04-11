@@ -109,6 +109,7 @@ To safely connect an ESP device to the boiler's X6 interface, a **galvanic isola
                      +------+     |  3.3V  |
                                   +--------+
 
+```
 
 This circuit is designed for ESP-01S, so the power supply comes from the X6 port.
 
